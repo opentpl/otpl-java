@@ -1,0 +1,7 @@
+<#if licenseFirst??>
+${licenseFirst}
+</#if>
+${licensePrefix}Copyright (C) ${date?date?string("yyyy")} The OpenTPL Project. All rights reserved.
+<#if licenseLast??>
+${licenseLast}
+</#if>
