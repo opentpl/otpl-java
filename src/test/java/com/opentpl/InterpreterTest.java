@@ -16,7 +16,10 @@ public class InterpreterTest {
 
     @Test
     public void testRender() throws Exception {
-        Interpreter interpreter = new Interpreter("", "F:\\workspace\\otpl-node\\test\\.otpl\\");
+        Interpreter interpreter = new Interpreter("", "F:\\workspace\\exam-web\\bin\\otil");
+        interpreter.setDebug(true);
+        interpreter.setStrictMode(true);
+
         Map<String, Object> data = new HashMap<>();
 
         Map<String, Object> map = new HashMap<>();
@@ -32,8 +35,12 @@ public class InterpreterTest {
         data.put("item", new Item(false, "李四", "url/ls"));
         data.put("array", new Object[]{"bbbb"});
         data.put("fn", InterpreterTest.class.getDeclaredMethod("fn"));
-        Context context = interpreter.render(data, "develop", System.out);
+        Context context = interpreter.render(data, "exam/paper", System.out);
+        System.out.println("=============destory");
         context.destory();
+
+        Thread.sleep(1000 * 60 * 60);
+
     }
 
     class Item {

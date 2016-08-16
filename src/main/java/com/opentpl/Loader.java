@@ -5,6 +5,7 @@ package com.opentpl;
 
 import com.opentpl.opil.Opcode;
 
+import java.io.File;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -43,14 +44,14 @@ public class Loader {
     /**
      * 打开一个OTIL文件
      *
-     * @param filename
+     * @param file il file
      * @throws Exception
      */
-    public static Loader open(String filename) throws Exception {
+    public static Loader open(File file) throws Exception {
 
         Loader loader = new Loader();
 
-        loader.channel = new RandomAccessFile(filename, "r").getChannel();
+        loader.channel = new RandomAccessFile(file, "r").getChannel();
         loader.buffer = loader.channel.map(FileChannel.MapMode.READ_ONLY, 0, loader.channel.size());
         loader.buffer.order(ByteOrder.BIG_ENDIAN);
 
@@ -65,13 +66,12 @@ public class Loader {
      * 关闭载入器的IO相关资源。
      */
     public void close() {
-        BufferUtils.clearBuffer(buffer);
-        buffer = null;
-
         try {
             channel.close();
         } catch (Throwable e) {
         } finally {
+            BufferUtils.clearBuffer(buffer);
+            buffer = null;
             channel = null;
         }
 

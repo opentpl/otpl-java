@@ -1,5 +1,7 @@
 package com.opentpl;
 
+import java.io.File;
+
 /**
  * @author Jun Hwong
  */
@@ -24,6 +26,8 @@ public interface Context {
     void exec(Loader loader, int ptr) throws Exception;
 
     Loader getLoader(String src, String ref);
+
+    Loader getLoaderWithILFile(File ifFile, String ref);
 
     void destory();
 }

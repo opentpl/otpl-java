@@ -2,6 +2,7 @@ package com.opentpl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import sun.nio.ch.FileChannelImpl;
 
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
@@ -21,11 +22,13 @@ import java.security.PrivilegedAction;
 public final class BufferUtils {
     private static final Log log = LogFactory.getLog(BufferUtils.class);
     private static Method getCleanerMethod;
-
+    private static Method unmap;
     static {
         try {
-            getCleanerMethod = MappedByteBuffer.class.getMethod("cleaner", new Class[0]);
-            getCleanerMethod.setAccessible(true);
+            unmap = FileChannelImpl.class.getDeclaredMethod("unmap", MappedByteBuffer.class);
+            unmap.setAccessible(true);
+//            getCleanerMethod = MappedByteBuffer.class.getMethod("clear", new Class[0]);//cleaner
+//            getCleanerMethod.setAccessible(true);
         } catch (Throwable e) {
             log.warn("Failed to get method getCleanerMethod:", e);
         }
@@ -44,8 +47,10 @@ public final class BufferUtils {
             @Override
             public Object run() {
                 try {
-                    sun.misc.Cleaner cleaner = (sun.misc.Cleaner) getCleanerMethod.invoke(buffer, new Object[0]);
-                    cleaner.clean();
+                    unmap.invoke(buffer, buffer);
+//                    System.out.println("clean===============");
+                    //sun.misc.Cleaner cleaner = (sun.misc.Cleaner) getCleanerMethod.invoke(buffer, new Object[0]);
+                    //cleaner.clean();
                 } catch (Throwable e) {
                     log.error("Failed to clean buffer:", e);
                 }

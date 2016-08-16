@@ -4,6 +4,7 @@ package com.opentpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.io.File;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,7 +81,7 @@ public class ContextImpl implements Context {
 
     @Override
     public boolean isStrict() {
-        return true;
+        return interpreter.isStrictMode();
     }
 
     @Override
@@ -133,22 +134,27 @@ public class ContextImpl implements Context {
 
     @Override
     public Loader getLoader(String viewName, String ref) {
+        return getLoaderWithILFile(interpreter.getILFile(viewName, ref), ref);
+    }
 
-        viewName = interpreter.canonicalViewName(viewName, ref);
+    @Override
+    public Loader getLoaderWithILFile(File ifFile, String ref) {
 
-        log.debug("viewName:" + viewName);
+        String key = ifFile.toString() + ref;
 
-        String key = viewName + ref;
+        Loader loader = loaders.getOrDefault(key, null);
 
-        Loader loader = loader = loaders.getOrDefault(key, null);
-
-        if (loader == null) {
+        if (loader == null && ifFile.exists()) {
 
             try {
-                loader = Loader.open(interpreter.getIlPath() + BufferUtils.md5(viewName) + ".otil");
+                loader = Loader.open(ifFile);
                 //TODO:
             } catch (Exception e) {
                 log.debug("Filed to open Loader:", e);
+            }
+
+            if (loader != null) {
+                loaders.put(key, loader);
             }
 
         }
