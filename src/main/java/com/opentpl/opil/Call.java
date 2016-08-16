@@ -33,9 +33,13 @@ public class Call extends Opcode {
         Object instance = null;
         Object methodObj = context.pop();
         Method method = null;
-
+        TemplateFunction templateFunction = null;
+        Object result = null;
         if (methodObj instanceof String) {
-            method = BuildinFunctions.methodMap.getOrDefault(methodObj.toString(), null);
+
+            templateFunction = BuildinFunctions.getFunction(methodObj.toString());
+
+            //method = BuildinFunctions.methodMap.getOrDefault(methodObj.toString(), null);
 
             if (method == null) {
 
@@ -58,34 +62,46 @@ public class Call extends Opcode {
             return ptr() + 1;
         }
 
-        if (method == null) {
-            throw new OtplRuntimeException("函数未找到：" + methodObj + "，line：" + getLineNumber() + ", view:" + getLoader().getViewName());
-        }
-
         //获取参数
-        List<Object> parameters = new ArrayList<>(method.getParameterCount());
+        List<Object> parameters = new ArrayList<>();//method.getParameterCount()
         for (int i = 0; i < parameterCount; i++) {
             parameters.add(context.pop());
         }
 
         Collections.reverse(parameters);
 
+        if (templateFunction != null) {
+
+            try {
+                result = templateFunction.call(parameters);
+            } catch (Throwable e) {
+                if (context.isStrict()) {
+                    throw e;
+                }
+            }
+
+            context.push(result);
+            return ptr() + 1;
+        }
+
+        if (method == null) {
+            throw new OtplRuntimeException("函数未找到：" + methodObj);
+        }
+
 
         //补齐参数
-        if (parameterCount < method.getParameterCount()) {
-            for (int i = 0; i < method.getParameterCount() - parameterCount; i++) {
-                parameters.add(null);
-            }
+        for (int i = 0; i < method.getParameterCount() - parameterCount; i++) {
+            parameters.add(null);
         }
 
         //类型转换
         Class<?>[] types = method.getParameterTypes();
-        for (int i = 0; i < parameters.size(); i++) {
+        for (int i = 0; i < Math.min(parameters.size(), types.length); i++) {
             parameters.set(i, Convert.cast(parameters.get(i), types[i], false));
         }
 
 
-        Object result = method.invoke(instance, parameters.toArray());
+        result = method.invoke(instance, parameters.toArray());
 
 
         context.push(result);

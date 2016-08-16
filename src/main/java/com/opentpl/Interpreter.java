@@ -94,17 +94,14 @@ public class Interpreter {
 
         if (loader == null) {
             //TODO: 报错或编译
-            context.print("载入视图模板失败：", false);
-        }
-
-        if (loader != null) {
+            context.print("Failed to load view", false);
+        } else {
             try {
                 exec(context, loader, loader.getStartPtr());
             } catch (Throwable e) {
-                context.print("渲染视图失败：" + e.getMessage(), false);
-                log.debug(e);
+                context.print("Failed to render view：" + e.getMessage(), false);
+                log.debug("Failed to render view：", e);
             }
-
         }
 
         return context;
@@ -114,7 +111,7 @@ public class Interpreter {
     public Context render(Map<String, ?> data, String viewName, OutputStream outputStream) throws Exception {
         File file = getILFile(viewName, "");
         if (!file.exists() || !file.isFile()) {
-            throw new FileNotFoundException("未找到视图：" + viewName);
+            throw new FileNotFoundException("Not found view：" + viewName);
         }
 
         return render(data, file, outputStream);
@@ -129,10 +126,14 @@ public class Interpreter {
             code = loader.load(startPtr);
 
             if (code == null) {
-                throw new IllegalArgumentException("ptr无效：" + startPtr);
+                throw new IllegalArgumentException("ptr无效：" + startPtr);//TODO:使用上一个行号来推导出当前错误位置
             }
 
-            startPtr = code.execute(context);
+            try {
+                startPtr = code.execute(context);
+            } catch (Throwable e) {
+                throw new RuntimeException(e.getMessage() + "，line：" + code.getLineNumber() + ", view:" + loader.getViewName(), e);
+            }
 
         }
 

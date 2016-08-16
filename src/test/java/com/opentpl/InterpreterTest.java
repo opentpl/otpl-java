@@ -32,14 +32,14 @@ public class InterpreterTest {
                 new Item(false, "张三", "url/zs"),
                 new Item(false, "李四", "url/ls")
         });
-        data.put("item", new Item(false, "李四", "url/ls"));
+        data.put("model", new Item(false, "李四", "url/ls"));
         data.put("array", new Object[]{"bbbb"});
         data.put("fn", InterpreterTest.class.getDeclaredMethod("fn"));
-        Context context = interpreter.render(data, "exam/paper", System.out);
+        Context context = interpreter.render(data, "index", System.out);//exam/paper
         System.out.println("=============destory");
         context.destory();
 
-        Thread.sleep(1000 * 60 * 60);
+//        Thread.sleep(1000 * 60 * 60);
 
     }
 

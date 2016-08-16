@@ -41,7 +41,7 @@ public class LoadMember extends Opcode {
 
         if (instance == null) {
             if (context.isStrict()) {
-                throw new OtplRuntimeException("不能在null值中获取对象成员，line：" + getLineNumber() + ", view:" + getLoader().getViewName());
+                throw new OtplRuntimeException("不能在null值中获取对象成员");
             }
             context.push(null);
             return ptr() + 1;
@@ -49,7 +49,7 @@ public class LoadMember extends Opcode {
 
         if (parameters.size() == 0) {
             if (context.isStrict()) {
-                throw new OtplRuntimeException("丢失参数(成员?)，line：" + getLineNumber() + ", view:" + getLoader().getViewName());
+                throw new OtplRuntimeException("丢失参数(成员?)");
             }
             context.push(null);
             return ptr() + 1;
@@ -57,7 +57,7 @@ public class LoadMember extends Opcode {
 
         if (instance.getClass().isPrimitive()) {
             if (context.isStrict()) {
-                throw new OtplRuntimeException("原生对象没有成员，line：" + getLineNumber() + ", view:" + getLoader().getViewName());
+                throw new OtplRuntimeException("原生对象没有成员");
             }
             context.push(null);
             return ptr() + 1;
@@ -77,7 +77,7 @@ public class LoadMember extends Opcode {
                 int index = n.intValue();
                 if (index >= len) {
                     if (context.isStrict()) {
-                        throw new OtplRuntimeException("超出数组长度：" + index + "/" + len + "，line：" + getLineNumber() + ", view:" + getLoader().getViewName());
+                        throw new OtplRuntimeException("超出数组长度：" + index + "/" + len);
                     }
                     context.push(null);
                 } else {
