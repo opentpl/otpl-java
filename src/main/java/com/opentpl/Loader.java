@@ -4,6 +4,8 @@
 package com.opentpl;
 
 import com.opentpl.opil.Opcode;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -21,6 +23,7 @@ import java.util.Map;
  */
 public class Loader {
 
+    private final Log log = LogFactory.getLog(this.getClass());
     private static final String OTPL_NAME = "OTIL";
     private MappedByteBuffer buffer;
     private FileChannel channel;
@@ -199,6 +202,7 @@ public class Loader {
         if (code == null) {
             throw new IllegalArgumentException("code");
         }
+        log.debug("put block:" + blockId);//TODO
         blocks.put(blockId.trim().toLowerCase(), code);
     }
 
@@ -225,5 +229,11 @@ public class Loader {
         }
         this.bodyLoader = bodyLoader;
         this.bodyStartPtr = bodyPtr;
+
+        for (String id : this.blocks.keySet()) {
+            bodyLoader.blocks.put(id, this.blocks.get(id));
+        }
+        this.blocks = bodyLoader.blocks;
+
     }
 }

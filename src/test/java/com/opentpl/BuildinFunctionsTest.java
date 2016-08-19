@@ -23,7 +23,7 @@ public class BuildinFunctionsTest {
 
         List args = new ArrayList();
         args.add("1");
-        args.add(3);
+        args.add(2);
         args.add("3");
 
 

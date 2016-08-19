@@ -72,6 +72,10 @@ public class Interpreter {
             base = "/" + base;
         }
 
+        if (viewName.startsWith("/")) {
+            base = "/";
+        }
+
         //TODO:针对不同平台的处理
         viewName = Paths.get("X:\\", base, viewName).normalize().toString()
                 .substring(2)
