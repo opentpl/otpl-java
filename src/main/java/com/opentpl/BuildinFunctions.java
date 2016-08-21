@@ -1,6 +1,7 @@
 package com.opentpl;
 
 import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -10,10 +11,19 @@ public class BuildinFunctions {
     private static final Map<String, TemplateFunction> functionMap = new HashMap<>();
 
     static {
-//        for (Method method : BuildinFunctions.class.getDeclaredMethods()) {
-//            method.setAccessible(true);
-//            methodMap.put(method.getName(), method);
-//        }
+
+        //当前系统时间
+        register(new TemplateFunction() {
+            @Override
+            public String functionName() {
+                return "now";
+            }
+
+            @Override
+            public Object call(List parameters) {
+                return System.currentTimeMillis() / 1000;
+            }
+        });
 
         register(new TemplateFunction() {
             @Override
@@ -102,6 +112,30 @@ public class BuildinFunctions {
             }
         });
 
+        //日期格式化
+        register(new TemplateFunction() {
+            @Override
+            public String functionName() {
+                return "time";
+            }
+
+            @Override
+            public Object call(List parameters) {
+                String result = "";
+                if (parameters == null || parameters.size() < 2) {
+                    return result;
+                }
+                long time = (long) parameters.get(0);
+                Date date = new Date(time * 1000);
+
+                SimpleDateFormat format = new SimpleDateFormat(parameters.get(1).toString());
+
+                result = format.format(date);
+
+                return result;
+            }
+        });
+
 
     }
 
@@ -112,34 +146,6 @@ public class BuildinFunctions {
     public static TemplateFunction getFunction(String name) {
         return functionMap.getOrDefault(name, null);
     }
-
-
-//    public static String str(Object[] args) {
-//        String result = "";
-//        if (args == null) {
-//            return result;
-//        }
-//        for (Object obj : args) {
-//            if (obj != null) {
-//                result += obj;
-//            }
-//        }
-//        return result;
-//    }
-//
-//    public static Iterator<Long> range(Long start, Long stop, Long step) {
-//
-//        if (stop == null && step == null) {
-//            stop = start;
-//            start = 0L;
-//            step = 1L;
-//        } else if (step == null) {
-//            step = 1L;
-//        }
-//
-//        return new RangeIterator(start, stop, step);
-//
-//    }
 
     static class RangeIterator implements Iterator<Long> {
         public RangeIterator(Long _start, Long _stop, Long _step) {
@@ -166,23 +172,6 @@ public class BuildinFunctions {
             return _start;
         }
     }
-//
-//    public static int len(Object obj) {
-//        if (obj == null) {
-//            return -1;
-//        } else if (obj instanceof Map) {
-//            return ((Map) obj).size();
-//        } else if (obj instanceof Collection) {
-//            return ((Collection) obj).size();
-//        } else if (obj instanceof String || "string".equals(obj.getClass().getName())) {
-//            return obj.toString().length();
-//        } else if (obj.getClass().isArray()) {
-//            return Array.getLength(obj);
-//        }
-//
-//
-//        return 0;
-//    }
 
 
 }
